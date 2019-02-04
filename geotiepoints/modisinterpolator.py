@@ -101,7 +101,10 @@ class ModisInterpolator():
         elif cres == 5000:
             self.cscan_len = 2
             self.cscan_width = 5
-            self.cscan_full_width = 271
+            if self.level == 1:
+                self.cscan_full_width = 271
+            elif self.level == 2:
+                self.cscan_full_width = 270
 
         if fres == 250:
             self.fscan_width = 4 * self.cscan_width
@@ -140,8 +143,13 @@ class ModisInterpolator():
         return x, y
 
     def _expand_tiepoint_array_5km(self, arr, lines, cols):
+        if self.level == 2:  # Repeat the last column to complete L2 data
+            arr = da.dstack([arr, arr[:, :, -1]])
         arr = da.repeat(arr, lines * 2, axis=1)
-        arr = da.repeat(arr.reshape((-1, self.cscan_full_width - 1)), cols, axis=1)
+        if self.level == 1:
+            arr = da.repeat(arr.reshape((-1, self.cscan_full_width - 1)), cols, axis=1)
+        elif self.level == 2:
+            arr = da.repeat(arr.reshape((-1, self.cscan_full_width)), cols, axis=1)
         return da.hstack((arr[:, :2], arr, arr[:, -2:]))
 
     def _get_coords_5km(self, scans):
@@ -149,10 +157,17 @@ class ModisInterpolator():
         y = np.tile(y, scans)
 
         x = (np.arange(self.fscan_full_width) - 2) % self.fscan_width
-        x[0] = -2
-        x[1] = -1
-        x[-2] = 5
-        x[-1] = 6
+        if self.level == 1:
+            x[-2] = 5
+            x[-1] = 6
+        else:
+            x[-7] = 5
+            x[-6] = 6
+            x[-5] = 7
+            x[-4] = 8
+            x[-3] = 9
+            x[-2] = 10
+            x[-1] = 11
         return x, y
 
     def interpolate(self, lon1, lat1, satz1):
