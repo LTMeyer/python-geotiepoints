@@ -244,7 +244,7 @@ def modis_1km_to_500m(lon1, lat1, satz1):
     return interp.interpolate(lon1, lat1, satz1)
 
 
-def modis_5km_to_1km(lon1, lat1, satz1):
+def modis_5km_to_1km(lon5, lat5, satz5, level=1):
 
-    interp = ModisInterpolator(5000, 1000)
-    return interp.interpolate(lon1, lat1, satz1)
+    interp = ModisInterpolator(5000, 1000, level)
+    return interp.interpolate(lon5, lat5, satz5)
