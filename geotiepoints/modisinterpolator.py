@@ -86,7 +86,14 @@ def get_corners(arr):
 
 class ModisInterpolator():
 
-    def __init__(self, cres, fres):
+    def __init__(self, cres, fres, level=1):
+        if level in [1, 2]:
+            self.level = level  # level of the product (e.g. L2 for MOD06)
+        else:
+            raise ValueError(
+                "Expected product level in [1, 2] but received {}".format(level)
+            )
+
         if cres == 1000:
             self.cscan_len = 10
             self.cscan_width = 1
